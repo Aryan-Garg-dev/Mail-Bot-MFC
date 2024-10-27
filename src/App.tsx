@@ -10,6 +10,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import useToken from "./hooks/use-token";
 import loginUser from "./utils/user-login";
 import { alert } from "./utils/toast";
+import { ImSpinner8 } from "react-icons/im";
 
 function App() {
   const [ file, setFile ] = useState<File|null>(null);
@@ -17,9 +18,12 @@ function App() {
   const [ isOpen, setIsOpen ] = useState(token.value === "");
 
   const onLogin = async (username: string, password: string)=>{
-    const token = await loginUser(username, password);
-    if (!token || token === "") alert.warning("Failed to login !!!")
-    else setIsOpen(false);
+    const _token = await loginUser(username, password);
+    if (!_token || _token === "") alert.warning("Failed to login !!!")
+    else {
+      token.set(_token);
+      setIsOpen(false);
+    }
   }
 
   return (
@@ -84,6 +88,8 @@ const DropMail = ({ file, openLoginModal }: {
   openLoginModal: ()=>void
 })=>{
   const token = useToken("token");
+  const [ loading, setLoading ] = useState(false);
+
   const handleUpload = async ()=>{
     if (token.value === ""){
       alert.warning("Login to send mail !!!")
@@ -94,24 +100,27 @@ const DropMail = ({ file, openLoginModal }: {
       alert.warning("Please select or drop a file first !!!");
       return;
     } 
+    setLoading(true);
     const formData = new FormData();
     formData.append('file', file);
     try {
       const response = await axios.post(mailEndpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'authorization': 'Bearer ' + token.value
         }
       })
-  
+      setLoading(false);
       alert.success(response.data.message);
     } catch(error){
       alert.warning("Error uploading file. Please try again !!!")
+      setLoading(false);
       console.log(error);
     }
   }
   return (
     <button className="w-full p-2 dark font-poppins shadow-md active:shadow-none shadow-slate-800 border-2 border-slate-700 text-dullWhite transition-transform duration-150 active:scale-90 text-center rounded-md" onClick={handleUpload}>
-      Send Mail
+      {!loading ? "Send Mail" : <div className="flex justify-center"><ImSpinner8 className="animate-spin text-slate-200 size-7" /></div>}
     </button>
   )
 }
@@ -136,7 +145,7 @@ const Login = ({
       </div>
       <div className="flex flex-col mt-2 gap-1">
         <label htmlFor="username" className="text-slate-400">Username</label>
-        <input type="text" id="username" className="bg-slate-900 focus:bg-slate-950 focus:outline-none focus:ring-2 caret-dullWhite focus:ring-slate-400 p-1 rounded-md text-slate-50 px-2 placeholder:text-slate-500 focus:placeholder:text-transparent" placeholder="garg" onChange = {(e)=>setUsername(e.target.value)} />
+        <input type="text" id="username" className="bg-slate-900 focus:bg-slate-950 focus:outline-none focus:ring-2 caret-dullWhite focus:ring-slate-400 p-1 rounded-md text-slate-50 px-2 placeholder:text-slate-500 focus:placeholder:text-transparent" placeholder="aryan" onChange = {(e)=>setUsername(e.target.value)} />
       </div>
       <div className="flex flex-col mb-4 gap-1">
         <label htmlFor="password" className="text-slate-400">Password</label>

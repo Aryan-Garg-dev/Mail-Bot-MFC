@@ -11,6 +11,8 @@ import useToken from "./hooks/use-token";
 import loginUser from "./utils/user-login";
 import { alert } from "./utils/toast";
 import { ImSpinner8 } from "react-icons/im";
+import Input from "./components/input";
+import Login from "./components/login";
 
 function App() {
   const [ file, setFile ] = useState<File|null>(null);
@@ -27,7 +29,7 @@ function App() {
   }
 
   return (
-    <div className='h-full min-h-screen w-full blue'>
+    <div className='h-full min-h-screen w-full blue px-5'>
       <Toaster position={"bottom-center"} />
       <section className="w-full py-5 flex flex-col items-center">
         <h1 className="text-dullWhite text-5xl font-bold">Mail Man</h1>
@@ -45,9 +47,13 @@ function App() {
 
 const FileUpload = ({ file, setFile, openLoginModal }: {
   file: File|null,
-  setFile: (file: File)=>void,
+  setFile: (file: File|null)=>void,
   openLoginModal: ()=>void,
 })=>{
+  const [ subject, setSubject ] = useState("");
+  const [ email, setEmail ] = useState("");
+  const [ password, setPassword ] = useState("");
+
   const onDrop = (acceptedFiles: File[]) => {
     setFile(acceptedFiles[0]);
     alert.success("File has been selected.")
@@ -64,27 +70,49 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
     <div {...getRootProps({ className: 'dropzone' })} className="w-full border border-dashed border-blue-200 min-h-32 text-dullWhite flex flex-col justify-center items-center dark cursor-pointer rounded-sm">
       <input {...getInputProps()} />
       {isDragActive ? (
-        <p>Drop the file here...</p>
+        <p className="mx-5">Drop the file here...</p>
       ) : (
-        <p>Drag & drop a CSV file here, or click to select a file</p>
+        <p className="mx-5">Drag & drop a CSV file here, or click to select a file</p>
       )}
     </div>
     {file && (
       <div className="w-full flex flex-col h-full gap-5">
-        <div className="flex flex-col mt-5 px-2 py-2 text-dullWhite border rounded-xl violet">
-          <div className="text-neutral-100 text-lg">{file.name}</div>
-          <div className="text-neutral-400">{calcSize(file.size)}</div>
+        <div className="flex justify-between items-center mt-5 px-3 py-2 text-dullWhite border rounded-xl violet">
+          <div className="flex flex-col">
+            <div className="text-neutral-100 text-lg">{file.name}</div>
+            <div className="text-neutral-400">{calcSize(file.size)}</div>
+          </div>
+          <div onClick={()=>setFile(null)}><IoIosCloseCircleOutline className="size-7 text-slate-300" /></div>
         </div>
-        <DropMail file={file} openLoginModal={openLoginModal} />
+        <div className="flex flex-col gap-4">
+          <Input label="Sender Mail" id="sender" setValue={setEmail} placeholder="Sender Mail" />
+          <Input label="App Password" id="app-password" setValue={setPassword} placeholder="App Password" />
+          <Input label="Subject" id="subject" setValue={setSubject} placeholder="Subject" />
+        </div>
+        <DropMail 
+          file={file} 
+          openLoginModal={openLoginModal} 
+          subject={subject} 
+          email={email} 
+          password={password} 
+        />
       </div>
     )}
   </div>
   )
 }
 
-
-const DropMail = ({ file, openLoginModal }: { 
+const DropMail = ({ 
+  file, 
+  openLoginModal, 
+  subject,
+  email,
+  password 
+}: { 
   file: File,
+  subject: string
+  email: string,
+  password: string,
   openLoginModal: ()=>void
 })=>{
   const token = useToken("token");
@@ -96,13 +124,23 @@ const DropMail = ({ file, openLoginModal }: {
       openLoginModal();
       return;
     }
+
     if (!file){
       alert.warning("Please select or drop a file first !!!");
       return;
-    } 
+    }
+
+    if (!email || !subject || !password){
+      alert.warning("Fill all the fields correctly.");
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append('file', file);
+    formData.append("subject", subject);
+    formData.append("email", email.trim());
+    formData.append("password", password.trim());
     try {
       const response = await axios.post(mailEndpoint, formData, {
         headers: {
@@ -124,37 +162,5 @@ const DropMail = ({ file, openLoginModal }: {
     </button>
   )
 }
-
-const Login = ({
-  handleClose,
-  handleSubmit
-}: {
-  handleClose: ()=>void,
-  handleSubmit: (username: string, password: string)=>void,
-})=>{
-  const [ username, setUsername ] = useState("");
-  const [ password, setPassword ] = useState("");
-  const onSubmit = ()=>{
-    handleSubmit(username, password);
-  }
-  return (
-    <div className="w-full max-w-md max-h-full p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-lg shadow-2xl shadow-slate-800 flex flex-col item-center gap-3 pb-5 px-10">
-      <div className="text-slate-300 text-3xl font-medium border-b-[3px] pb-2 border-slate-600 flex justify-between items-center">
-        <div>Login</div>
-        <div onClick={handleClose}><IoIosCloseCircleOutline /></div>
-      </div>
-      <div className="flex flex-col mt-2 gap-1">
-        <label htmlFor="username" className="text-slate-400">Username</label>
-        <input type="text" id="username" className="bg-slate-900 focus:bg-slate-950 focus:outline-none focus:ring-2 caret-dullWhite focus:ring-slate-400 p-1 rounded-md text-slate-50 px-2 placeholder:text-slate-500 focus:placeholder:text-transparent" placeholder="aryan" onChange = {(e)=>setUsername(e.target.value)} />
-      </div>
-      <div className="flex flex-col mb-4 gap-1">
-        <label htmlFor="password" className="text-slate-400">Password</label>
-        <input type="password" id="password" className="bg-slate-900 focus:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 caret-dullWhite p-1 rounded-md text-slate-50 px-2 placeholder:text-slate-500 focus:placeholder:text-transparent" placeholder="secret" onChange = {(e)=>setPassword(e.target.value)} />
-      </div>
-      <button className="bg-slate-900 hover:bg-slate-950 text-slate-200 text-xl font-medium p-1 rounded-md active:scale-95 hover:text-slate-300" onClick={onSubmit}>Login</button>
-    </div>
-  )
-}
-
 
 export default App

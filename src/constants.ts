@@ -1,0 +1,1 @@
+export const mailEndpoint = import.meta.env.VITE_BE_URL;

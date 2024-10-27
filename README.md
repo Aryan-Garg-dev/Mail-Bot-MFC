@@ -3,5 +3,5 @@
 # MFC MAIL BOT
 
 ## Author
-- Aryan Garg
-- Abhinav Garg
+- [Aryan Garg](https://github.com/Aryan-Garg-dev/Mail-Bot-MFC)
+- [Abhinav Garg](https://github.com/ABHINAVGARG05/Mail_Sender)

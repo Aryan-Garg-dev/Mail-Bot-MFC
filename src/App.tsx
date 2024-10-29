@@ -50,7 +50,7 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
   setFile: (file: File|null)=>void,
   openLoginModal: ()=>void,
 })=>{
-  const [ subject, setSubject ] = useState("");
+  // const [ subject, setSubject ] = useState("");
   const [ email, setEmail ] = useState("");
   const [ password, setPassword ] = useState("");
 
@@ -87,12 +87,12 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
         <div className="flex flex-col gap-4">
           <Input label="Sender Mail" id="sender" setValue={setEmail} placeholder="Sender Mail" />
           <Input label="App Password" id="app-password" setValue={setPassword} placeholder="App Password" />
-          <Input label="Subject" id="subject" setValue={setSubject} placeholder="Subject" />
+          {/* <Input label="Subject" id="subject" setValue={setSubject} placeholder="Subject" /> */}
         </div>
         <DropMail 
           file={file} 
           openLoginModal={openLoginModal} 
-          subject={subject} 
+          // subject={subject} 
           email={email} 
           password={password} 
         />
@@ -105,12 +105,12 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
 const DropMail = ({ 
   file, 
   openLoginModal, 
-  subject,
+  // subject,
   email,
   password 
 }: { 
   file: File,
-  subject: string
+  subject?: string
   email: string,
   password: string,
   openLoginModal: ()=>void
@@ -130,7 +130,7 @@ const DropMail = ({
       return;
     }
 
-    if (!email || !subject || !password){
+    if (!email || !password){
       alert.warning("Fill all the fields correctly.");
       return;
     }
@@ -138,7 +138,7 @@ const DropMail = ({
     setLoading(true);
     const formData = new FormData();
     formData.append('file', file);
-    formData.append("subject", subject);
+    // formData.append("subject", subject);
     formData.append("email", email.trim());
     formData.append("password", password.trim());
     try {

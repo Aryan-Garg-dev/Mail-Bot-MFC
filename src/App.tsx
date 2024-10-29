@@ -5,28 +5,29 @@ import { calcSize } from "./utils/file-size";
 import { Toaster } from "sonner";
 import axios from "axios";
 import { mailEndpoint } from "./constants";
-import Modal from "./components/modal";
+// import Modal from "./components/modal";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import useToken from "./hooks/use-token";
-import loginUser from "./utils/user-login";
+// import loginUser from "./utils/user-login";
 import { alert } from "./utils/toast";
 import { ImSpinner8 } from "react-icons/im";
 import Input from "./components/input";
-import Login from "./components/login";
+// import Login from "./components/login";
 
 function App() {
   const [ file, setFile ] = useState<File|null>(null);
-  const token = useToken("token");
-  const [ isOpen, setIsOpen ] = useState(token.value === "");
+  // const token = useToken("token");
+  // const [ isOpen, setIsOpen ] = useState(token.value === "");
+  // const [ isOpen, setIsOpen ] = useState(false);
 
-  const onLogin = async (username: string, password: string)=>{
-    const _token = await loginUser(username, password);
-    if (!_token || _token === "") alert.warning("Failed to login !!!")
-    else {
-      token.set(_token);
-      setIsOpen(false);
-    }
-  }
+  // const onLogin = async (username: string, password: string)=>{
+  //   const _token = await loginUser(username, password);
+  //   if (!_token || _token === "") alert.warning("Failed to login !!!")
+  //   else {
+  //     token.set(_token);
+  //     setIsOpen(false);
+  //   }
+  // }
 
   return (
     <div className='h-full min-h-screen w-full blue px-5'>
@@ -35,20 +36,20 @@ function App() {
         <h1 className="text-dullWhite text-5xl font-bold">Mail Man</h1>
       </section>
       <section className="w-full flex flex-col items-center">
-        <FileUpload file={file} setFile={setFile} openLoginModal={()=>setIsOpen(true)} />
+        <FileUpload file={file} setFile={setFile} />
       </section>
-      {isOpen && <Modal isOpen={isOpen}>
+      {/* {isOpen && <Modal isOpen={isOpen}>
         <Login handleClose={()=>setIsOpen(false)} handleSubmit={onLogin} />
-      </Modal>}
+      </Modal>} */}
     </div>
   )
 }
 
 
-const FileUpload = ({ file, setFile, openLoginModal }: {
+const FileUpload = ({ file, setFile }: {
   file: File|null,
   setFile: (file: File|null)=>void,
-  openLoginModal: ()=>void,
+  openLoginModal?: ()=>void,
 })=>{
   // const [ subject, setSubject ] = useState("");
   const [ email, setEmail ] = useState("");
@@ -91,7 +92,7 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
         </div>
         <DropMail 
           file={file} 
-          openLoginModal={openLoginModal} 
+          // openLoginModal={openLoginModal} 
           // subject={subject} 
           email={email} 
           password={password} 
@@ -104,7 +105,7 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
 
 const DropMail = ({ 
   file, 
-  openLoginModal, 
+  // openLoginModal, 
   // subject,
   email,
   password 
@@ -113,17 +114,17 @@ const DropMail = ({
   subject?: string
   email: string,
   password: string,
-  openLoginModal: ()=>void
+  openLoginModal?: ()=>void
 })=>{
   const token = useToken("token");
   const [ loading, setLoading ] = useState(false);
 
   const handleUpload = async ()=>{
-    if (token.value === ""){
-      alert.warning("Login to send mail !!!")
-      openLoginModal();
-      return;
-    }
+    // if (token.value === ""){
+    //   alert.warning("Login to send mail !!!")
+    //   openLoginModal();
+    //   return;
+    // }
 
     if (!file){
       alert.warning("Please select or drop a file first !!!");

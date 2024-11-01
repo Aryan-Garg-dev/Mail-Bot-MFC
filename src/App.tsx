@@ -86,7 +86,8 @@ const FileUpload = ({ file, setFile, openLoginModal }: {
         </div>
         <div className="flex flex-col gap-4">
           <Input label="Sender Mail" id="sender" setValue={setEmail} placeholder="Sender Mail" />
-          <Input label="App Password" id="app-password" setValue={setPassword} placeholder="App Password" />
+          <Input label="App Password" id="app-password" setValue={setPassword} placeholder="App Password" type="password">
+          </Input>
           {/* <Input label="Subject" id="subject" setValue={setSubject} placeholder="Subject" /> */}
         </div>
         <DropMail 
@@ -157,7 +158,7 @@ const DropMail = ({
     }
   }
   return (
-    <button className="w-full p-2 dark font-poppins shadow-md active:shadow-none shadow-slate-800 border-2 border-slate-700 text-dullWhite transition-transform duration-150 active:scale-90 text-center rounded-md" onClick={handleUpload}>
+    <button className={`w-full p-2 dark font-poppins shadow-md active:shadow-none shadow-slate-800 border-2 border-slate-700 text-dullWhite transition-transform duration-150 active:scale-90 text-center rounded-md ${loading && "active:scale-100 shadow-sm"}`} onClick={handleUpload} disabled={loading}>
       {!loading ? "Send Mail" : <div className="flex justify-center"><ImSpinner8 className="animate-spin text-slate-200 size-7" /></div>}
     </button>
   )
